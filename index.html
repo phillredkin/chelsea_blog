@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="author" content="Stefan Korecko" />
+  <link rel="stylesheet" href="css/normalize.css" />
+  <link rel="stylesheet" href="css/treesBlog.css" media="screen" />
+  <title>Sports News | Chelsea</title>
+  <!-- Favicon -->
+  <link rel="icon" href="fig/logo.png" />
+  <!-- Font Awesome Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div
+    id="g_id_onload"
+    data-client_id="885702175379-em96r3hbo5gfaeb9llk0mrcr0kct3ujl.apps.googleusercontent.com"
+    data-context="signin"
+    data-ux_mode="popup"
+    data-callback="handleCredentialResponse"
+    data-auto_prompt="false"
+  ></div>
+
+  <header>
+    <div class="container">
+      <div class="navbar">
+        <div class="navbar_logo">
+          <svg>
+            <use href="./fig/symbol-defs.svg#icon-logo"></use>
+          </svg>
+        </div>
+        <div class="navbar_links">
+          <div class="navbar_links_left">
+            <ul>
+              <li><a href="#welcome">Welcome!</a></li>
+              <li><a href="#articles">Articles</a></li>
+              <li><a href="#artInsert">Add Article</a></li>
+              <li><a href="#myArticles">My Articles</a></li>
+              <li><a href="#opinions">Visitor opinions</a></li>
+              <li><a href="#addOpinion">Add your opinion</a></li>
+            </ul>
+          </div>
+          <div class="navbar_links_right">
+            <div id="user-info" class="hiddenElm">
+              <img id="user-pic" src="qdwqdwqw" alt="User Picture" />
+              <span id="user-name"></span>
+              <button id="sign-out-button">Sign Out</button>
+            </div>
+            <div class="g_id_signin"
+                 id="google-signin-button"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-width="250"
+                 data-logo_alignment="left">
+            </div>
+          </div>
+        </div>
+        <div class="burger_menu">
+          <i class="fa fa-bars"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="router-view"></main>
+
+  <footer>
+    <div class="container">
+      <p>All rights reserved &copy; 2024</p>
+    </div>
+  </footer>
+
+
+  <script id="template-welcome" type="text/template">
+    <div class="container layout">
+        <div class="main_content">
+            <section>
+                <h1>Chelsea Insights</h1>
+                <p>
+                    Welcome to <b>Chelsea Insights</b>, your ultimate destination for everything related to Chelsea Football Club! Whether you're a lifelong supporter or a new fan, our blog is dedicated to providing you with the latest news, in-depth analyses, and exclusive content about one of the most iconic clubs in the Premier League.
+                </p>
+                <br>
+                <p>
+                    At Chelsea Insights, we cover a wide range of topics including match previews and reviews, player profiles, transfer rumors, tactical breakdowns, and behind-the-scenes stories from Stamford Bridge. Our team of passionate writers and analysts strive to deliver accurate and engaging content that keeps you informed and entertained throughout the football season.
+                </p>
+                <br>
+                <p>
+                    Join our community of Chelsea fans to share your thoughts, engage in lively discussions, and stay connected with fellow supporters from around the world. Whether it's celebrating victories, dissecting defeats, or debating the latest team strategies, Chelsea Insights is here to enhance your fan experience.
+                </p>
+                <br>
+                <p>
+                    Stay tuned for regular updates and never miss a moment of Chelsea FC action. Subscribe to our newsletter and follow us on social media to keep up with all the latest developments. Let’s support the Blues together and celebrate the glory of Chelsea Football Club!
+                </p>
+                <br>
+                <br>
+                <p>Author: <a href="mailto:fylyp.redkin@student.tuke.sk" class="author" title="Mail to Fylyp Redkin">Fylyp Redkin</a></p>
+            </section>
+        </div>
+        <aside class="sidebar">
+            <div class="banner">
+                <img src="fig/side_banner.jpg" alt="Banner" class="banner_image">
+            </div>
+        </aside>
+    </div>
+  </script>
+
+
+  <script id="template-articles" type="text/template">
+    <div class="container layout">
+        <div class="opinionsContainer">
+            <h1 style="text-align: center; color: #034694;">Articles (Page {{pageNumber}} of {{totalPages}})</h1>
+            {{#articles}}
+                <section>
+                    <h2><a href="{{detailLink}}">{{title}}</a></h2>
+                    <p>by {{author}}</p>
+                    <p>{{{content}}}</p>
+                </section>
+            {{/articles}}
+
+            {{^articles}}
+                <p>No articles found.</p>
+            {{/articles}}
+
+            <div class="navigation">
+                {{#hasPrev}}
+                    <a href="#articles/{{prevPage}}/{{totalPages}}"><i class="fa fa-arrow-left" style="margin-right: 0.5rem;"></i>Previous</a>
+                {{/hasPrev}}
+
+                {{#hasNext}}
+                    <a href="#articles/{{nextPage}}/{{totalPages}}">Next<i class="fa fa-arrow-right" style="margin-left: 0.5rem;"></i></a>
+                {{/hasNext}}
+            </div>
+        </div>
+    </div>
+  </script>
+
+
+  <script id="template-my-articles" type="text/template">
+    <div class="container layout">
+        <div class="opinionsContainer">
+            <h1 style="text-align: center; color: #034694;">My Articles</h1>
+            {{#articles}}
+                <section>
+                    <h2><a href="{{detailLink}}">{{title}}</a></h2>
+                    <p>by {{author}}</p>
+                    <p>{{{content}}}</p>
+                </section>
+            {{/articles}}
+
+            {{^articles}}
+                <p style="text-align: center;">are absent</p>
+            {{/articles}}
+
+            <div class="navigation">
+                {{#hasPrev}}
+                    <a href="#myArticles/{{prevPage}}/{{totalPages}}"><i class="fa fa-arrow-left" style="margin-right: 0.5rem;"></i>Previous</a>
+                {{/hasPrev}}
+
+                {{#hasNext}}
+                    <a href="#myArticles/{{nextPage}}/{{totalPages}}">Next<i class="fa fa-arrow-right" style="margin-left: 0.5rem;"></i></a>
+                {{/hasNext}}
+            </div>
+        </div>
+    </div>
+  </script>
+
+
+  <script id="template-article" type="text/template">
+    <div class="container layout">
+        <div class="opinionsContainer">
+            <section>
+                <h3>{{title}}</h3>
+                <p>by {{author}}</p>
+                {{#userTags}}
+                    <p style="color: #034694">#{{userTags}}</p>
+                {{/userTags}}
+
+                {{#imageLink}}
+                    <figure>
+                        <img src="{{imageLink}}" alt="article figure" />
+                    </figure>
+                {{/imageLink}}
+                <div style="margin-top: 1rem;">
+                    {{{content}}}
+                </div>
+            </section>
+
+            <div class="btns">
+                <a href="{{backLink}}" class="linkAsButton"><i class="fa fa-arrow-left" style="margin-right: 0.3rem;"></i> Back</a>
+                <a href="{{editLink}}" class="linkAsButton">Edit <i class="fa-solid fa-pen-to-square" style="margin-left: 0.3rem;"></i></a>
+                <a href="{{deleteLink}}" class="linkAsButton">Delete <i class="fa-solid fa-trash-can" style="margin-left: 0.3rem;"></i></a>
+            </div>
+        </div>
+
+        <div class="opinionsContainer" id="commentsSection">
+            <h2>Comments</h2>
+            {{#comments}}
+                <section>
+                    <h4>{{author}}</h4>
+                    <p>{{text}}</p>
+                </section>
+            {{/comments}}
+            {{^comments}}
+                <p>No comments yet.</p>
+            {{/comments}}
+
+            <div class="navigation">
+                {{#hasPrevComments}}
+                    <a href="#article/{{id}}/{{pageNumber}}/{{totalPages}}/{{prevCommentPage}}" class="comment-nav-link"><i class="fa fa-arrow-left"></i> Previous</a>
+                {{/hasPrevComments}}
+
+                {{#hasNextComments}}
+                    <a href="#article/{{id}}/{{pageNumber}}/{{totalPages}}/{{nextCommentPage}}" class="comment-nav-link">Next <i class="fa fa-arrow-right"></i></a>
+                {{/hasNextComments}}
+            </div>
+
+            <button id="btAddComment">Add Comment</button>
+            <div id="addCommentForm" class="hiddenElm">
+                {{> commentForm}}
+            </div>
+        </div>
+    </div>
+  </script>
+
+
+  <script id="template-comment-form" type="text/template">
+    <section class="send_form">
+        <h3>Add a new comment</h3>
+        <form id="commentForm">
+            <label for="commentAuthor">Name:</label>
+            <input type="text" name="commentAuthor" id="commentAuthor" required>
+            <br>
+            <label for="commentText">Comment:</label>
+            <textarea name="commentText" id="commentText" rows="5" required></textarea>
+            <br>
+            <button type="submit">Send comment</button>
+            <button type="button" id="cancelComment">Cancel</button>
+        </form>
+    </section>
+  </script>
+
+
+  <script id="template-article-form" type="text/template">
+    <div class="container layout">
+        <section class="send_form">
+            <h2>{{formTitle}}</h2> <br><br>
+
+            <form id="articleForm">
+                <label for="author">Author:</label>
+                <input type="text" name="author" id="author" value="{{author}}" size="50"
+                    title="Article author, max. length 100 characters."
+                    maxlength="100" placeholder="e.g. Ján Trieska" />
+                <br>
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" value="{{title}}" size="50"
+                    maxlength="100" pattern="\S[\S\s]*" placeholder="e.g. My story." required
+                    title="Article title, mandatory item, max. length: 100 characters.
+                                The first character must not be a space."  />
+                <br>
+                <label for="imageLink">Image (url):</label>
+                <input type="url" name="imageLink" id="imageLink" value="{{imageLink}}" size="50"
+                    title="Image URL, max. length 100 characters." maxlength="100"/>
+                <br>
+
+                <br>
+                <label for="content">Article content:</label>
+                <textarea
+                        name="content" id="content" spellcheck="true" lang="sk"
+                        cols="50" rows="20" required
+                        title="Article content, mandatory item, can be plain text or in HTML.">
+                    {{content}}
+                </textarea>
+                <br>
+                <label for="tags">Keywords:</label>
+                <input  type="text" name="tags" id="tags" value="{{tags}}" size="50"
+                        title="Keyword list, comma separated." placeholder="e.g. village, drama" />
+                <br> <br>
+                <button type="submit">{{submitBtTitle}}</button>
+                <button type="reset">Reset Form</button>
+            </form>
+        </section>
+        <div class="btns">
+            <a href="{{backLink}}" class="linkAsButton"><i class="fa fa-arrow-left" style="margin-right: 0.3rem;"></i>Back</a>
+            <a href="#welcome" class="linkAsButton">Up to the menu <i class="fa-solid fa-arrow-up"></i></a>
+        </div>
+    </div>
+  </script>
+
+
+  <script id="template-articles-error" type="text/template">
+    <article>
+        <h2>Articles acquisition failed</h2>
+        <p>
+            {{errMessage}}
+        </p>
+    </article>
+  </script>
+
+
+  <script id="template-opinions" type="text/template">
+    <div class="container layout">
+        <div class="opinionsContainer">
+            <h1 class="visitors_opinions">Visitors opinions</h1>
+            {{#opinions}}
+                <section>
+                    <h3>{{name}}
+                        <i>({{createdDate}})</i>
+                        {{#radioAndCheckBox}}
+                            {{#role}}
+                                - {{role}}
+                            {{/role}}
+                        {{/radioAndCheckBox}}
+                    </h3>
+                    <p style="font-weight: bold">{{email}}</p>
+                    {{#keyword}}
+                        <h4 class="keyword_text">Keyword: {{keyword}}</h4>
+                    {{/keyword}}
+                    <p>{{comment}}</p>
+                    {{#url}}
+                        <img src="{{url}}" alt="Image">
+                    {{/url}}
+                    {{^url}}
+                        <img src="fig/image_was_not_found.jpeg" alt="Image">
+                    {{/url}}
+                    {{#radioAndCheckBox}}
+                        {{#is_subscribed}}
+                            <p class="subscribed">Subscribed to updates.</p>
+                        {{/is_subscribed}}
+                        {{^is_subscribed}}
+                            <p class="not-subscribed">Not subscribed to updates.</p>
+                        {{/is_subscribed}}
+                    {{/radioAndCheckBox}}
+                </section>
+            {{/opinions}}
+            {{^opinions}}
+                <p class="no_visitors_opinions">No opinions yet.</p>
+            {{/opinions}}
+        </div>
+    </div>
+  </script>
+
+
+  <script id="template-addOpinion" type="text/template">
+    <div class="container layout">
+        <section class="send_form">
+            <h1>Fill in the form</h1>
+            <form id="opnFrm">
+                <label for="name">Name<span class="required">*</span></label>
+                <input type="text" name="name" id="name" required>
+
+                <label for="email">Email<span class="required">*</span></label>
+                <input type="email" name="email" id="email" required>
+
+                <label for="url">Image URL</label>
+                <input type="url" name="url" id="url">
+
+                <label for="keywords">Keywords</label>
+                <input type="text" name="keywords" id="keywords" list="keywords_list">
+                <datalist id="keywords_list">
+                    <option value="Chelsea">
+                    <option value="EPL">
+                    <option value="Transfer">
+                    <option value="Tactics">
+                    <option value="Stadium">
+                    <option value="Coach">
+                    <option value="Player">
+                    <option value="Rumours">
+                </datalist>
+
+                <div class="block">
+                    <span>You are a</span>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="journalist" name="role" value="journalist">
+                            <label for="journalist">journalist</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="fan" name="role" value="fan">
+                            <label for="fan">fan</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="player" name="role" value="player">
+                            <label for="player">player</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="coach" name="role" value="coach">
+                            <label for="coach">coach</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="subscribe" name="subscribe">
+                        <label for="subscribe">I want to receive more information on email</label>
+                    </div>
+                </div>
+
+                <label for="comment">Your message<span class="required">*</span></label>
+                <textarea id="comment" name="comment" required></textarea>
+
+                <button type="submit">Send</button>
+                <button type="reset">Reset</button>
+            </form>
+        </section>
+    </div>
+  </script>
+
+
+  <script type="module" src="js/index.js"></script>
+  <script src="js/articleFormsHandler.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $(".burger_menu").click(function () {
+        $(".navbar").toggleClass("active");
+      });
+    });
+  </script>
+
+  <script>
+    // Глобальный объект для хранения данных пользователя
+    let currentUser = null;
+
+    function handleCredentialResponse(response) {
+      const token = response.credential;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      // Сохранение необходимых данных
+      currentUser = {
+        id: payload.sub,
+        givenName: payload.given_name,
+        familyName: payload.family_name,
+        fullName: `${payload.given_name} ${payload.family_name}`,
+        email: payload.email,
+        picture: payload.picture
+      };
+
+      // Сохранение в localStorage для сохранения состояния
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+      // Обновление интерфейса
+      updateUIOnSignIn();
+    }
+
+    // Функция обновления интерфейса после входа
+    function updateUIOnSignIn() {
+      // Скрыть кнопку входа
+      document.getElementById('google-signin-button').classList.add('hiddenElm');
+
+      // Показать информацию о пользователе
+      const userInfoDiv = document.getElementById('user-info');
+      document.getElementById('user-pic').src = currentUser.picture;
+      document.getElementById('user-name').textContent = currentUser.fullName;
+      userInfoDiv.classList.remove('hiddenElm');
+    }
+
+    // Функция выхода
+    function signOut() {
+      google.accounts.id.disableAutoSelect();
+
+      // Очистка данных пользователя
+      currentUser = null;
+      localStorage.removeItem('currentUser');
+
+      // Обновление интерфейса
+      document.getElementById('user-info').classList.add('hiddenElm');
+      document.getElementById('google-signin-button').classList.remove('hiddenElm');
+    }
+
+    // Добавление слушателя события для кнопки выхода
+    window.onload = function() {
+      // Проверка, вошел ли пользователь ранее
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+        updateUIOnSignIn();
+      }
+
+      const signOutButton = document.getElementById('sign-out-button');
+      if (signOutButton) {
+        signOutButton.addEventListener('click', signOut);
+      }
+    }
+  </script>
+
+</body>
+</html>
