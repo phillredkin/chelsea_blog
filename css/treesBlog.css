@@ -682,6 +682,10 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .container.layout {
+            flex-direction: column;
+        }
     
         .sidebar {
             display: block;
