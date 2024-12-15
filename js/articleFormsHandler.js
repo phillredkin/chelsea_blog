@@ -17,62 +17,82 @@ export default class articleFormsHandler {
         if (!form) {
             return;
         }
-
+    
         const currentUser = this.getCurrentUser();
         if (currentUser) {
             form.author.value = currentUser.fullName;
             form.author.readOnly = true;
         }
-
+    
         form.onsubmit = (evt) => {
             evt.preventDefault();
             const formData = new FormData(form);
-
-            let tags = formData.get('tags') || "";
+    
+            let tags = formData.get('tags');
+            if (!tags) {
+                tags = "";
+            }
             tags = this.ensureHiddenTag(tags);
-
+    
+            let author;
+            if (currentUser) {
+                author = currentUser.fullName;
+            } else {
+                author = formData.get('author');
+            }
+    
             const articleData = {
-                author: currentUser ? currentUser.fullName : formData.get('author'),
+                author: author,
                 title: formData.get('title'),
                 content: formData.get('content'),
                 tags: tags,
                 imageLink: formData.get('imageLink')
             };
-
+    
             this.insertArticle(articleData, pageNumber, totalPages);
         }
-    }
+    }    
 
     assignFormAndArticle(formId, hiddenFieldId, articleId, pageNumber, totalPages) {
         const form = document.getElementById(formId);
         if (!form) {
             return;
         }
-
+    
         const currentUser = this.getCurrentUser();
         if (currentUser) {
             form.author.value = currentUser.fullName;
             form.author.readOnly = true;
         }
-
+    
         form.onsubmit = (evt) => {
             evt.preventDefault();
             const formData = new FormData(form);
-
-            let tags = formData.get('tags') || "";
+    
+            let tags = formData.get('tags');
+            if (!tags) {
+                tags = "";
+            }
             tags = this.ensureHiddenTag(tags);
-
+    
+            let author;
+            if (currentUser) {
+                author = currentUser.fullName;
+            } else {
+                author = formData.get('author');
+            }
+    
             const articleData = {
-                author: currentUser ? currentUser.fullName : formData.get('author'),
+                author: author,
                 title: formData.get('title'),
                 content: formData.get('content'),
                 tags: tags,
                 imageLink: formData.get('imageLink')
             };
-
+    
             this.updateArticle(articleId, articleData, pageNumber, totalPages);
         };
-    }
+    }    
 
     ensureHiddenTag(tagsString) {
         const tagsArray = tagsString
@@ -102,7 +122,7 @@ export default class articleFormsHandler {
             }
         };
         xhr.onerror = () => {
-            alert("Network error while adding the article.");
+            alert("Errors");
         };
         xhr.send(JSON.stringify(articleData));
     }
@@ -122,7 +142,7 @@ export default class articleFormsHandler {
             }
         };
         xhr.onerror = () => {
-            alert("Network error while updating the article.");
+            alert("Error");
         };
         xhr.send(JSON.stringify(articleData));
     }

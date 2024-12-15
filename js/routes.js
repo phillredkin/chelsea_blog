@@ -2,14 +2,20 @@ import Mustache from "./mustache.js";
 import processOpnFrmData from "./addOpinion.js";
 import articleFormsHandler from "./articleFormsHandler.js";
 
+
+
 const urlBase = "https://wt.kpi.fei.tuke.sk/api";
 const articlesPerPage = 20;
 const commentsPerPage = 10;
 const HIDDEN_TAG = "chelsea";
 
+
+
 if (!window.artFrmHandler) {
     window.artFrmHandler = new articleFormsHandler(urlBase);
 }
+
+
 
 export default [
     {
@@ -90,12 +96,16 @@ export default [
     }
 ];
 
+
+
 function addArtDetailLink2ResponseJson(responseData, pageNumber, totalPages) {
     responseData.articles = responseData.articles.map(article => ({
         ...article,
         detailLink: `#article/${article.id}/${pageNumber}/${totalPages}/1`
     }));
 }
+
+
 
 function fetchAndDisplayArticles(targetElm, pageNumberFromHash, totalPagesFromHash) {
     let pageNumber = parseInt(pageNumberFromHash);
@@ -132,35 +142,94 @@ function fetchAndDisplayArticles(targetElm, pageNumberFromHash, totalPagesFromHa
                 return;
             }
 
-            addArtDetailLink2ResponseJson({ articles: responseData.articles }, pageNumber, totalPages);
+            const articles = responseData.articles;
+            let loadedCount = 0;
 
-            const dataForRender = {
-                articles: responseData.articles.map(article => ({
-                    ...article,
-                    detailLink: `#article/${article.id}/${pageNumber}/${totalPages}/1`
-                })),
-                hasPrev: pageNumber > 1,
-                hasNext: pageNumber < totalPages,
-                prevPage: pageNumber > 1 ? pageNumber - 1 : null,
-                nextPage: pageNumber < totalPages ? pageNumber + 1 : null,
-                pageNumber: pageNumber,
-                totalPages: totalPages
-            };
+            if (articles.length === 0) {
+                renderArticles(articles);
+            } else {
+                articles.forEach((article, index) => {
+                    const artUrl = `${urlBase}/article/${article.id}`;
+                    const artXhr = new XMLHttpRequest();
+                    artXhr.open("GET", artUrl, true);
+                    artXhr.onload = function() {
+                        if (this.status === 200) {
+                            const fullArticle = JSON.parse(this.responseText);
+                            articles[index].content = fullArticle.content;
+                        } else {
+                            articles[index].content = "<p>[No content]</p>";
+                        }
+                        loadedCount++;
+                        if (loadedCount === articles.length) {
+                            renderArticles(articles);
+                        }
+                    };
+                    artXhr.onerror = function() {
+                        articles[index].content = "<p>[Failed to load content]</p>";
+                        loadedCount++;
+                        if (loadedCount === articles.length) {
+                            renderArticles(articles);
+                        }
+                    };
+                    artXhr.send();
+                });
+            }
 
-            const articlesTemplate = document.getElementById("template-articles").innerHTML;
-            const rendered = Mustache.render(articlesTemplate, dataForRender);
-            document.getElementById(targetElm).innerHTML = rendered;
+            function renderArticles(articles) {
+                addArtDetailLink2ResponseJson(
+                    { 
+                        articles: articles 
+                    }, 
+                    pageNumber, 
+                    totalPages
+                );
+
+                let hasPrev = false;
+                let hasNext = false;
+                let prevPage = null;
+                let nextPage = null;
+
+                if (pageNumber > 1) {
+                    hasPrev = true;
+                    prevPage = pageNumber - 1;
+                }
+
+                if (pageNumber < totalPages) {
+                    hasNext = true;
+                    nextPage = pageNumber + 1;
+                }
+
+                const dataForRender = {
+                    articles: articles.map(article => ({
+                        ...article,
+                        detailLink: `#article/${article.id}/${pageNumber}/${totalPages}/1`
+                    })),
+                    hasPrev: hasPrev,
+                    hasNext: hasNext,
+                    prevPage: prevPage,
+                    nextPage: nextPage,
+                    pageNumber: pageNumber,
+                    totalPages: totalPages
+                };
+
+                const articlesTemplate = document.getElementById("template-articles").innerHTML;
+                const rendered = Mustache.render(articlesTemplate, dataForRender);
+                document.getElementById(targetElm).innerHTML = rendered;
+            }
+
         } else {
             alert("Error: " + this.statusText);
         }
     };
 
     ajax.onerror = function () {
-        alert("Network error while retrieving articles.");
+        alert("Error");
     };
 
     ajax.send();
 }
+
+
 
 function fetchAndDisplayMyArticles(targetElm) {
     const currentUser = window.artFrmHandler.getCurrentUser();
@@ -193,15 +262,24 @@ function fetchAndDisplayMyArticles(targetElm) {
     };
 
     ajax.onerror = function () {
-      alert("Network error while retrieving articles.");
+      alert("Error");
     };
 
     ajax.send();
 }
 
+
+
 function insertArticle(targetElm, pageNumberFromHash, totalPagesFromHash) {
-    const pageNumber = parseInt(pageNumberFromHash) || 1;
-    const totalPages = parseInt(totalPagesFromHash) || 1;
+    let pageNumber = parseInt(pageNumberFromHash);
+    if (isNaN(pageNumber) || pageNumber < 1) {
+        pageNumber = 1;
+    }
+
+    let totalPages = parseInt(totalPagesFromHash);
+    if (isNaN(totalPages) || totalPages < 1) {
+        totalPages = 1;
+    }
 
     const backLink = `#articles/${pageNumber}/${totalPages}`;
 
@@ -222,6 +300,8 @@ function insertArticle(targetElm, pageNumberFromHash, totalPagesFromHash) {
 
     window.artFrmHandler.assignFormForInsert("articleForm", pageNumber, totalPages);
 }
+
+
 
 function deleteArticle(targetElm, artIdFromHash, pageNumberFromHash, totalPagesFromHash) {
     const articleId = artIdFromHash;
@@ -250,22 +330,36 @@ function deleteArticle(targetElm, artIdFromHash, pageNumberFromHash, totalPagesF
     };
 
     ajax.onerror = function () {
-        alert("Network error while deleting the article.");
+        alert("Error");
     };
 
     ajax.send();
 }
 
+
+
 function editArticle(targetElm, artIdFromHash, pageNumberFromHash, totalPagesFromHash) {
     fetchAndProcessArticle(targetElm, artIdFromHash, pageNumberFromHash, totalPagesFromHash, true);
 }
 
+
+
 function fetchAndDisplayArticleDetail(targetElm, artIdFromHash, pageNumberFromHash, totalPagesFromHash, commentPageFromHash) {
     const pageNumber = parseInt(pageNumberFromHash);
     const totalPages = parseInt(totalPagesFromHash);
-    const commentPage = commentPageFromHash ? parseInt(commentPageFromHash) : 1;
+
+    let commentPage;
+
+    if (commentPageFromHash) {
+        commentPage = parseInt(commentPageFromHash);
+    } else {
+        commentPage = 1;
+    }
+
     fetchAndProcessArticle(targetElm, artIdFromHash, pageNumber, totalPages, false, commentPage);
 }
+
+
 
 function fetchAndProcessArticle(targetElm, artIdFromHash, pageNumber, totalPages, forEdit, commentPage=1) {
     const url = `${urlBase}/article/${artIdFromHash}`;
@@ -304,7 +398,9 @@ function fetchAndProcessArticle(targetElm, artIdFromHash, pageNumber, totalPages
                     responseJSON.deleteLink = `#artDelete/${responseJSON.id}/${pageNumber}/${totalPages}`;
                 }
 
-                const partials = { commentForm: document.getElementById("template-comment-form").innerHTML };
+                const partials = { 
+                    commentForm: document.getElementById("template-comment-form").innerHTML 
+                };
 
                 const initialData = {
                     ...responseJSON,
@@ -355,7 +451,9 @@ function fetchAndProcessArticle(targetElm, artIdFromHash, pageNumber, totalPages
                 });
             }
         } else {
-            const errMsgObj = { errMessage: this.responseText };
+            const errMsgObj = { 
+                errMessage: this.responseText 
+            };
             const errorTemplate = document.getElementById("template-articles-error").innerHTML;
             const rendered = Mustache.render(errorTemplate, errMsgObj);
             document.getElementById(targetElm).innerHTML = rendered;
@@ -363,11 +461,13 @@ function fetchAndProcessArticle(targetElm, artIdFromHash, pageNumber, totalPages
     };
 
     ajax.onerror = function () {
-        alert("Network error while retrieving the article.");
+        alert("Error");
     };
 
     ajax.send();
 }
+
+
 
 function createHtml4opinions(targetElm) {
     let opinions = [];
@@ -394,6 +494,8 @@ function createHtml4opinions(targetElm) {
     targetElement.insertAdjacentHTML('afterbegin', rendered);
 }
 
+
+
 function addComment(artId, author, text, callback) {
     const url = `${urlBase}/article/${artId}/comment`;
     const data = { author: author, text: text };
@@ -411,11 +513,13 @@ function addComment(artId, author, text, callback) {
     };
 
     xhr.onerror = function () {
-        callback("Network error");
+        callback("Error");
     };
 
     xhr.send(JSON.stringify(data));
 }
+
+
 
 function fetchComments(artId, commentPage, callback) {
     const maxComments = commentsPerPage + 1;
@@ -438,14 +542,24 @@ function fetchComments(artId, commentPage, callback) {
                 comments.pop();
             }
 
+            let commentTotalPages = commentPage;
+            if (hasNextComments) {
+                commentTotalPages = commentPage + 1;
+            }
+
+            let nextCommentPage = null;
+            if (hasNextComments) {
+                nextCommentPage = commentPage + 1;
+            }
+
             callback(null, {
                 comments: comments,
                 commentPage: commentPage,
-                commentTotalPages: hasNextComments ? commentPage + 1 : commentPage,
+                commentTotalPages: commentTotalPages,
                 hasPrevComments: commentPage > 1,
                 hasNextComments: hasNextComments,
                 prevCommentPage: commentPage - 1,
-                nextCommentPage: hasNextComments ? commentPage + 1 : null
+                nextCommentPage: nextCommentPage
             });
         } else {
             callback("Error fetching comments", null);
@@ -453,11 +567,13 @@ function fetchComments(artId, commentPage, callback) {
     };
 
     xhr.onerror = function () {
-        callback("Network error while fetching comments", null);
+        callback("Error", null);
     };
 
     xhr.send();
 }
+
+
 
 function addCommentHandlers(artIdFromHash, pageNumber, totalPages, responseJSON, targetElm, partials) {
     const btAddComment = document.getElementById("btAddComment");
@@ -498,7 +614,10 @@ function addCommentHandlers(artIdFromHash, pageNumber, totalPages, responseJSON,
                 addCommentForm.classList.add("hiddenElm");
                 commentForm.reset();
 
-                const currentCommentPage = responseJSON.commentPage || 1;
+                let currentCommentPage = responseJSON.commentPage;
+                if (!currentCommentPage) {
+                    currentCommentPage = 1;
+                }
 
                 fetchComments(artIdFromHash, currentCommentPage, (err, updatedCommentsData) => {
                     if (err) {
